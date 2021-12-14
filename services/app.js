@@ -60,6 +60,57 @@ module.exports.login = async (options) => {
 }
 
 
+
+module.exports.signUp = async (options) => {
+    return new Promise(async (resolve, reject) => {
+        options.mDbClient.connect(async (err, client) => {
+            console.log("Connected successfully to  mdb server");
+            var body = options.body
+            console.log("body", body)
+            try {
+                var db = client.db("HariDb");
+                var userObj = {
+                    "userName": body.name,
+                    "password": body.password,
+                    "email":body.email,
+                    "coursesEnrolled":[]
+                };
+                var query = { userName: body.name };
+                db.collection("user's").find(query).toArray(function (err, result) {
+                    if (err) throw err
+                    if (result.length > 0) {
+                        reject({
+                            response: "choose another name",
+                            status: 400
+                        })
+                    } else {
+                        db.collection("user's").insertOne(userObj, function (err, res) {
+                            if (err) throw err;
+                           
+                            resolve(result = {
+                                response: "created succesfully",
+                                status: 200
+                            })
+                            //   client.close();
+                        });
+                    }
+                });
+
+
+            } catch (error) {
+                
+            }
+            
+        })
+
+     }
+    )
+}
+
+
+
+
+
 module.exports.getAllPrograms=async (options)=>{
     return new Promise(async (resolve, reject) => {
                 options.mDbClient.connect(async (err, client) => {
